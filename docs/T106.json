@@ -1,0 +1,9 @@
+{
+  "name": "TripSplit",
+  "id": "com.tripsplit.tripsplit",
+  "version": "1.0.0",
+  "disable": 0,
+  "code": "FULL_IAP",
+  "status": "ACTIVE",
+  "msg": "IAP enabled"
+}
