@@ -78,7 +78,7 @@ class TripProvider extends ChangeNotifier {
     final trip = Trip(
       id: _uuid.v4(),
       name: name.trim(),
-      currency: hasMultiCurrency ? currency : 'VND',
+      currency: currency,
       members: members,
       expenses: [],
       createdAt: DateTime.now(),
@@ -89,6 +89,32 @@ class TripProvider extends ChangeNotifier {
     await _save();
     notifyListeners();
     return trip;
+  }
+
+  Future<bool> updateTripDetails({
+    required String tripId,
+    required String name,
+    required List<Member> members,
+    String? currency,
+    String? note,
+    required bool hasMultiCurrency,
+  }) async {
+    final trip = getTrip(tripId);
+    if (trip == null || members.length < 2) return false;
+
+    await updateTrip(trip.copyWith(
+      name: name.trim(),
+      members: members,
+      currency: hasMultiCurrency ? (currency ?? trip.currency) : trip.currency,
+      note: note?.trim(),
+    ));
+    return true;
+  }
+
+  bool memberHasExpenses(Trip trip, String memberId) {
+    return trip.expenses.any(
+      (e) => e.paidById == memberId || e.splitAmongIds.contains(memberId),
+    );
   }
 
   Future<void> updateTrip(Trip trip) async {

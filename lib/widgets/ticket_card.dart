@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../core/constants/app_colors.dart';
+import '../core/utils/currency_formatter.dart';
 import '../core/constants/app_strings.dart';
 import '../models/trip.dart';
 import '../providers/shop_provider.dart';
@@ -126,12 +127,8 @@ class TicketCard extends StatelessWidget {
     );
   }
 
-  static String _formatAmount(double amount, String currency) {
-    if (currency == 'VND') {
-      return '${amount.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}đ';
-    }
-    return '${amount.toStringAsFixed(2)} $currency';
-  }
+  static String _formatAmount(double amount, String currency) =>
+      CurrencyFormatter.format(amount, currency);
 }
 
 class _StatChip extends StatelessWidget {

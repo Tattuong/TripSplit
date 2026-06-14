@@ -5,6 +5,7 @@ import 'package:uuid/uuid.dart';
 
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
+import '../../core/utils/currency_formatter.dart';
 import '../../models/expense.dart';
 import '../../providers/shop_provider.dart';
 import '../../providers/trip_provider.dart';
@@ -56,7 +57,7 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
       return;
     }
 
-    final amount = double.tryParse(_amountCtrl.text.replaceAll(',', '').replaceAll('.', ''));
+    final amount = CurrencyFormatter.parseAmount(_amountCtrl.text, trip.currency);
     if (amount == null || amount <= 0) {
       AppToast.show(context, title: AppStrings.t(context, 'enterAmount'), color: AppColors.warning);
       return;
@@ -135,12 +136,19 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
           const SizedBox(height: 12),
           TextField(
             controller: _amountCtrl,
-            keyboardType: TextInputType.number,
-            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            keyboardType: CurrencyFormatter.usesDecimals(trip.currency)
+                ? const TextInputType.numberWithOptions(decimal: true)
+                : TextInputType.number,
+            inputFormatters: [
+              if (CurrencyFormatter.usesDecimals(trip.currency))
+                FilteringTextInputFormatter.allow(RegExp(r'[\d.,]'))
+              else
+                FilteringTextInputFormatter.digitsOnly,
+            ],
             decoration: InputDecoration(
               labelText: AppStrings.t(context, 'amount'),
               prefixIcon: const Icon(Icons.payments_outlined),
-              suffixText: trip.currency,
+              suffixText: CurrencyFormatter.currencyLabel(trip.currency),
             ),
           ),
           const SizedBox(height: 16),

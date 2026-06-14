@@ -1,6 +1,7 @@
 import '../../models/expense.dart';
 import '../../models/member.dart';
 import '../../models/trip.dart';
+import '../utils/currency_formatter.dart';
 
 class MemberBalance {
   final Member member;
@@ -115,7 +116,7 @@ class SettlementService {
   static String formatShareText(SettlementResult result, Trip trip, {bool includeDetails = true}) {
     final buf = StringBuffer();
     buf.writeln('${trip.name} — TripSplit');
-    buf.writeln('Total: ${_formatAmount(result.totalExpenses, trip.currency)}');
+    buf.writeln('Total: ${CurrencyFormatter.format(result.totalExpenses, trip.currency)}');
     buf.writeln('');
 
     if (result.transfers.isEmpty) {
@@ -123,7 +124,7 @@ class SettlementService {
     } else {
       buf.writeln('Payments:');
       for (final t in result.transfers) {
-        buf.writeln('${t.from.name} → ${t.to.name}: ${_formatAmount(t.amount, trip.currency)}');
+        buf.writeln('${t.from.name} → ${t.to.name}: ${CurrencyFormatter.format(t.amount, trip.currency)}');
       }
     }
 
@@ -133,19 +134,11 @@ class SettlementService {
       for (final b in result.balances) {
         if (b.balance.abs() < 0.01) continue;
         final sign = b.balance > 0 ? '+' : '';
-        buf.writeln('${b.member.name}: $sign${_formatAmount(b.balance, trip.currency)}');
+        buf.writeln('${b.member.name}: $sign${CurrencyFormatter.format(b.balance, trip.currency)}');
       }
     }
 
     return buf.toString().trim();
-  }
-
-  static String _formatAmount(double amount, String currency) {
-    final abs = amount.abs();
-    if (currency == 'VND') {
-      return '${abs.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}đ';
-    }
-    return '${abs.toStringAsFixed(2)} $currency';
   }
 }
 

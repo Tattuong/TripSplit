@@ -7,6 +7,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/services/settlement_service.dart';
+import '../../core/utils/currency_formatter.dart';
 import '../../models/expense.dart';
 import '../../models/trip.dart';
 import '../../providers/shop_provider.dart';
@@ -14,6 +15,7 @@ import '../../providers/trip_provider.dart';
 import '../../widgets/app_toast.dart';
 import '../../widgets/member_avatar.dart';
 import 'add_expense_screen.dart';
+import 'create_trip_screen.dart';
 
 class TripDetailScreen extends StatelessWidget {
   final String tripId;
@@ -37,6 +39,13 @@ class TripDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(trip.name, style: const TextStyle(fontWeight: FontWeight.w800)),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.edit_outlined),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => CreateTripScreen(tripId: tripId)),
+            ),
+          ),
           if (shop.hasExportBackup)
             IconButton(
               icon: const Icon(Icons.download_outlined),
@@ -133,7 +142,7 @@ class _SummaryCard extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Text(
-            _formatAmount(settlement.totalExpenses, trip.currency),
+            CurrencyFormatter.format(settlement.totalExpenses, trip.currency),
             style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900),
           ),
           Text(
@@ -145,12 +154,8 @@ class _SummaryCard extends StatelessWidget {
     );
   }
 
-  static String _formatAmount(double amount, String currency) {
-    if (currency == 'VND') {
-      return '${amount.toStringAsFixed(0).replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.')}đ';
-    }
-    return '${amount.toStringAsFixed(2)} $currency';
-  }
+  static String _formatAmount(double amount, String currency) =>
+      CurrencyFormatter.format(amount, currency);
 }
 
 class _ExpenseTile extends StatelessWidget {

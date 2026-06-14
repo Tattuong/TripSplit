@@ -85,11 +85,13 @@ class TripsScreen extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _openCreate(context),
-        icon: const Icon(Icons.add_rounded),
-        label: Text(AppStrings.t(context, 'createTrip')),
-      ),
+      floatingActionButton: trips.trips.isEmpty
+          ? null
+          : FloatingActionButton.extended(
+              onPressed: () => _openCreate(context),
+              icon: const Icon(Icons.add_rounded),
+              label: Text(AppStrings.t(context, 'createTrip')),
+            ),
     );
   }
 
